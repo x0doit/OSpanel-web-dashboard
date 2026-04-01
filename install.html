@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OSPanel Dashboard — Installer</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--c-primary:#9f3b46;--c-primary-dark:#7a2530;--c-primary-light:#fbeaea;--c-text:#2a1a1a;--c-text-muted:#6b5a5a;--c-text-light:#9a8a8a;--c-bg:#fcf8f7;--c-border:#eee3e3;--c-surface:#ffffff;--radius:12px;--radius-sm:8px;--shadow:0 2px 8px rgba(154,138,138,.10),0 1px 3px rgba(154,138,138,.08)}
+html{font-size:14px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--c-text);background:var(--c-bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+a{color:var(--c-primary);text-decoration:none}a:hover{color:var(--c-primary-dark)}
+
+.installer{width:100%;max-width:520px}
+.logo{text-align:center;margin-bottom:28px}
+.logo svg{margin-bottom:12px}
+.logo h1{font-size:20px;font-weight:700;color:var(--c-primary-dark)}
+.logo p{font-size:13px;color:var(--c-text-muted);margin-top:4px}
+
+.card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--c-border);font-size:13px;font-weight:700;color:var(--c-text);display:flex;align-items:center;gap:8px}
+.card-header .num{width:24px;height:24px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.card-body{padding:16px 20px}
+
+.check-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px}
+.check-row+.check-row{border-top:1px solid var(--c-border)}
+.ci{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci.ok{background:#e8f5e9}.ci.ok svg{stroke:#43a047}
+.ci.fail{background:#ffebee}.ci.fail svg{stroke:#c62828}
+.ci.wait{background:#f5f5f5}.ci.wait svg{stroke:#bbb}
+.check-label{flex:1;font-weight:500}
+.check-detail{font-size:11.5px;color:var(--c-text-light);text-align:right;max-width:220px;word-break:break-all}
+
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11.5px;font-weight:600;color:var(--c-text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input{width:100%;padding:9px 12px;border:1px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;outline:none;background:var(--c-bg);color:var(--c-text);transition:border .15s}
+.form-group input:focus{border-color:var(--c-primary)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 24px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;width:100%}
+.btn-primary{background:var(--c-primary);color:#fff}.btn-primary:hover{background:var(--c-primary-dark)}.btn-primary:disabled{background:#cbb;cursor:not-allowed}
+.btn-outline{background:transparent;color:var(--c-primary);border:1px solid var(--c-border)}.btn-outline:hover{border-color:var(--c-primary);background:var(--c-primary-light)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-delete{background:transparent;color:#c62828;border:1px solid #ecc}.btn-delete:hover{background:#ffebee}
+.btn+.btn{margin-top:8px}
+
+.result{padding:14px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px}
+.result.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.result.err{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
+.result ul{margin:6px 0 0 18px;font-size:12px}
+
+.footer{text-align:center;margin-top:20px;font-size:11px;color:var(--c-text-light)}
+.footer a{color:var(--c-text-muted)}
+.hidden{display:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.fade{animation:fadeIn .3s ease}
+</style>
+</head>
+<body>
+
+<div class="installer">
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#9f3b46"/><path d="M8 22V10l8-4 8 4v12l-8 4-8-4z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M8 10l8 4 8-4M16 14v12" fill="none" stroke="#fff" stroke-width="1.5" opacity=".5"/></svg>
+    <h1>OSPanel Dashboard</h1>
+    <p>Installer</p>
+  </div>
+
+  <!-- Step 1: OSPanel path -->
+  <div class="card fade" id="step1">
+    <div class="card-header"><span class="num">1</span> OSPanel Path</div>
+    <div class="card-body">
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Path to OSPanel</label>
+        <input type="text" id="osp-path" placeholder="C:\OSPanel">
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="runChecks()">Check</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Checks -->
+  <div class="card fade hidden" id="step2">
+    <div class="card-header"><span class="num">2</span> System Check</div>
+    <div class="card-body" id="checks"></div>
+  </div>
+
+  <!-- Step 3: Install -->
+  <div class="card fade hidden" id="step3">
+    <div class="card-header"><span class="num">3</span> Install</div>
+    <div class="card-body">
+      <div id="result" class="hidden"></div>
+      <button class="btn btn-primary" id="btn-install" onclick="doInstall()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install Dashboard
+      </button>
+      <div id="post" class="hidden">
+        <a class="btn btn-outline" href="http://ospanel/" target="_blank">
+          Open Dashboard
+        </a>
+        <button class="btn btn-delete" onclick="doCleanup()">
+          Remove installer from OSPanel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer"><a href="https://github.com/x0doit" target="_blank">x0doit</a></div>
+</div>
+
+<script>
+var API = 'api/install.php';
+
+function svgOk(){return '<div class="ci ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>'}
+function svgFail(){return '<div class="ci fail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>'}
+function svgWait(){return '<div class="ci wait"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg></div>'}
+
+function getRoot(){return document.getElementById('osp-path').value.trim().replace(/[\\/]+$/,'')}
+
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+
+// Auto-detect OSPanel on load
+fetch(API+'?action=detect').then(function(r){return r.json()}).then(function(d){
+    if(d.found) {
+        document.getElementById('osp-path').value = d.root;
+        runChecks();
+    }
+}).catch(function(){});
+
+function runChecks(){
+    var root = getRoot();
+    if(!root){alert('Enter the OSPanel path');return}
+
+    show('step2'); hide('step3'); hide('result');
+    document.getElementById('checks').innerHTML =
+        '<div class="check-row">'+svgWait()+'<div class="check-label">Checking...</div></div>';
+
+    fetch(API+'?action=check&root='+encodeURIComponent(root))
+    .then(function(r){return r.json()})
+    .then(function(d){
+        var h='';
+        d.checks.forEach(function(c){
+            h+='<div class="check-row">'+(c.ok?svgOk():svgFail())+
+               '<div class="check-label">'+c.label+'</div>'+
+               '<div class="check-detail">'+c.detail+'</div></div>';
+        });
+        document.getElementById('checks').innerHTML = h;
+        if(d.ready){
+            show('step3');
+            document.getElementById('btn-install').textContent =
+                d.installed ? 'Reinstall / Update' : 'Install Dashboard';
+            document.getElementById('btn-install').disabled = false;
+            document.getElementById('btn-install').style.display = '';
+            hide('post');
+        }
+    })
+    .catch(function(){
+        document.getElementById('checks').innerHTML =
+            '<div class="check-row">'+svgFail()+
+            '<div class="check-label">Cannot connect to installer backend</div>'+
+            '<div class="check-detail">Run install.bat first</div></div>';
+    });
+}
+
+function doInstall(){
+    var btn = document.getElementById('btn-install');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Installing...';
+    hide('result'); hide('post');
+
+    fetch(API+'?action=install',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({root:getRoot()})
+    })
+    .then(function(r){return r.json()})
+    .then(function(d){
+        var el = document.getElementById('result');
+        if(d.ok){
+            el.className = 'result ok';
+            el.innerHTML = '<strong>Installation complete!</strong><br>'+
+                'Files copied: '+d.copied+(d.state?'<br>State generated':'');
+            show('result'); show('post');
+            btn.style.display = 'none';
+        } else if(d.error){
+            el.className = 'result err';
+            el.innerHTML = '<strong>Error:</strong> '+d.error;
+            show('result');
+            btn.disabled = false;
+            btn.innerHTML = 'Retry';
+        } else {
+            el.className = 'result err';
+            var msg = '<strong>'+d.message+'</strong>';
+            if(d.errors&&d.errors.length){
+                msg+='<ul>';
+                d.errors.forEach(function(e){msg+='<li>'+e+'</li>'});
+                msg+='</ul>';
+            }
+            el.innerHTML = msg;
+            show('result');
+            if(d.copied>0) show('post');
+            btn.disabled = false;
+            btn.innerHTML = 'Retry';
+        }
+    })
+    .catch(function(){
+        var el = document.getElementById('result');
+        el.className = 'result err';
+        el.innerHTML = '<strong>Connection error.</strong> Is install.bat still running?';
+        show('result');
+        btn.disabled = false;
+        btn.innerHTML = 'Retry';
+    });
+}
+
+function doCleanup(){
+    if(!confirm('Remove install.html and install.php from OSPanel?\n\nYour source folder will NOT be touched.')) return;
+    fetch(API+'?action=cleanup',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({root:getRoot()})
+    })
+    .then(function(r){return r.json()})
+    .then(function(d){
+        var msg = '';
+        if(d.removed && d.removed.length) msg += 'Removed:\n'+d.removed.join('\n')+'\n\n';
+        if(d.failed && d.failed.length) msg += 'Failed:\n'+d.failed.join('\n')+'\n\n';
+        if(!msg) msg = 'Nothing to remove.\n';
+        if(d.ok) msg += 'You can close this window.';
+        alert(msg);
+    })
+    .catch(function(){alert('Failed to connect to backend')});
+}
+</script>
+</body>
+</html>

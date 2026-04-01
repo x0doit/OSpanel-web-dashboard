@@ -1,0 +1,49 @@
+{
+    "version": "v6.5.0",
+    "generated": "2026-01-01T00:00:00+00:00",
+    "api_token": "",
+    "modules": [
+        {
+            "name": "Apache",
+            "category": "HTTP",
+            "version": "2.4.x",
+            "enabled": true,
+            "profile": "default",
+            "running": true
+        },
+        {
+            "name": "MySQL-8.0",
+            "category": "MySQL",
+            "version": "8.0.x",
+            "enabled": true,
+            "profile": "default",
+            "running": true
+        },
+        {
+            "name": "PHP-8.3",
+            "category": "PHP",
+            "version": "8.3.x",
+            "enabled": true,
+            "profile": "default",
+            "running": true
+        }
+    ],
+    "projects": [
+        {
+            "domain": "example.local",
+            "folder": "example.local",
+            "enabled": true,
+            "http_engine": "Apache",
+            "php_engine": "PHP-8.3",
+            "node_engine": "auto",
+            "tls": false,
+            "web_root": "{base_dir}"
+        }
+    ],
+    "logs": [
+        "[2026-01-01 00:00:00.000] Open Server Panel v6.5.0",
+        "[2026-01-01 00:00:00.100] Apache (default): module started",
+        "[2026-01-01 00:00:00.200] MySQL-8.0 (default): module started",
+        "[2026-01-01 00:00:00.300] PHP-8.3 (default): module started"
+    ]
+}
